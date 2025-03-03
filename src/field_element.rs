@@ -1,13 +1,13 @@
 use std::fmt;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-struct FieldElement {
+pub struct FieldElement {
     num: i128,
     prime: i128,
 }
 
 impl FieldElement {
-    fn new(num: i128, prime: i128) -> Result<Self, String> {
+    pub fn new(num: i128, prime: i128) -> Result<Self, String> {
         let mut num = num % prime;
 
         if num < 0 {
