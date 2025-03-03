@@ -12,7 +12,7 @@ pub struct FieldElement {
 
 impl FieldElement {
     pub fn new(num: i32, prime: i32) -> Result<Self, String> {
-        let mut num = num % prime;
+        let num = num % prime;
 
         if num >= prime {
             return Err(format!("Num {} not in field range 0 to {}", num, prime - 1));
