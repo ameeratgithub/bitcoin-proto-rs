@@ -204,4 +204,52 @@ mod tests {
             assert!(p.is_err());
         }
     }
+
+    #[test]
+    fn point_addition_over_finite_field() {
+        let prime = 223;
+
+        let a = FieldElement::new(0, prime).unwrap();
+        let b = FieldElement::new(7, prime).unwrap();
+
+        let x1 = FieldElement::new(192, prime).unwrap();
+        let y1 = FieldElement::new(105, prime).unwrap();
+        let x2 = FieldElement::new(17, prime).unwrap();
+        let y2 = FieldElement::new(56, prime).unwrap();
+
+        let p1 = Point::new(Some(x1), Some(y1), a, b).unwrap();
+        let p2 = Point::new(Some(x2), Some(y2), a, b).unwrap();
+
+        assert_eq!(format!("{}", (p1 + p2).unwrap()), "(170, 142, 0, 7)");
+
+        let x1 = FieldElement::new(170, prime).unwrap();
+        let y1 = FieldElement::new(142, prime).unwrap();
+        let x2 = FieldElement::new(60, prime).unwrap();
+        let y2 = FieldElement::new(139, prime).unwrap();
+
+        let p1 = Point::new(Some(x1), Some(y1), a, b).unwrap();
+        let p2 = Point::new(Some(x2), Some(y2), a, b).unwrap();
+
+        assert_eq!(format!("{}", (p1 + p2).unwrap()), "(220, 181, 0, 7)");
+
+        let x1 = FieldElement::new(47, prime).unwrap();
+        let y1 = FieldElement::new(71, prime).unwrap();
+        let x2 = FieldElement::new(17, prime).unwrap();
+        let y2 = FieldElement::new(56, prime).unwrap();
+
+        let p1 = Point::new(Some(x1), Some(y1), a, b).unwrap();
+        let p2 = Point::new(Some(x2), Some(y2), a, b).unwrap();
+
+        assert_eq!(format!("{}", (p1 + p2).unwrap()), "(215, 68, 0, 7)");
+
+        let x1 = FieldElement::new(143, prime).unwrap();
+        let y1 = FieldElement::new(98, prime).unwrap();
+        let x2 = FieldElement::new(76, prime).unwrap();
+        let y2 = FieldElement::new(66, prime).unwrap();
+
+        let p1 = Point::new(Some(x1), Some(y1), a, b).unwrap();
+        let p2 = Point::new(Some(x2), Some(y2), a, b).unwrap();
+
+        assert_eq!(format!("{}", (p1 + p2).unwrap()), "(47, 71, 0, 7)");
+    }
 }
