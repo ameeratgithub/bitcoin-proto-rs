@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::Add;
+use std::ops::{Add, Mul};
 
 use crate::ecc::field_element::FieldElement;
 
@@ -75,11 +75,13 @@ impl Add for Point {
             let x1 = self.x.unwrap();
             let y1 = self.y.unwrap();
 
-            let p1 = 3 * (x1.field_power(2)?).num + self.a.num;
-            let p2 = 2 * y1.num;
-            let s = FieldElement::new(p1 / p2, x1.prime)?;
+            let c_3 = FieldElement::new(3, x1.prime)?;
+            let c_2 = FieldElement::new(2, x1.prime)?;
+            let p1 = ((c_3 * (x1.field_power(2)?))? + self.a)?;
+            let p2 = (c_2 * y1)?;
+            let s = (p1 / p2)?;
 
-            let x3 = (s.field_power(2)? - (FieldElement::new(2, x1.prime)? * x1)?)?;
+            let x3 = (s.field_power(2)? - (c_2 * x1)?)?;
             let y3 = ((s * (x1 - x3)?)? - y1)?;
 
             Point::new(Some(x3), Some(y3), self.a, self.b)
@@ -88,6 +90,27 @@ impl Add for Point {
         }
     }
 }
+
+impl Mul<i32> for Point {
+    type Output = Result<Self, String>;
+
+    fn mul(self, mut coef: i32) -> Self::Output {
+        let mut current = self.clone();
+        let mut result = Self::new(None, None, self.a, self.b)?;
+
+        while coef > 0 {
+            if coef & 1 != 0 {
+                result = (result + current)?;
+            }
+
+            current = (current.clone() + current)?;
+            coef >>= 1;
+        }
+
+        Ok(result)
+    }
+}
+
 impl fmt::Display for Point {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -251,5 +274,21 @@ mod tests {
         let p2 = Point::new(Some(x2), Some(y2), a, b).unwrap();
 
         assert_eq!(format!("{}", (p1 + p2).unwrap()), "(47, 71, 0, 7)");
+    }
+
+    #[test]
+    fn scalar_multiplication() {
+        let prime = 223;
+        let a = FieldElement::new(0, prime).unwrap();
+        let b = FieldElement::new(7, prime).unwrap();
+
+        let x1 = FieldElement::new(47, prime).unwrap();
+        let y1 = FieldElement::new(71, prime).unwrap();
+
+        let p = Point::new(Some(x1), Some(y1), a, b).unwrap();
+
+        assert_eq!(format!("{}", (p * 1).unwrap()), "(47, 71, 0, 7)");
+        assert_eq!(format!("{}", (p * 9).unwrap()), "(69, 86, 0, 7)");
+        assert_eq!(format!("{}", (p * 20).unwrap()), "(47, 152, 0, 7)");
     }
 }
